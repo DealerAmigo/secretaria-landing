@@ -636,88 +636,9 @@
   </div>
 </section>
 
-<!--
-  ══════════════════════════════════════════
-  FOOTER FIRMA — SecretarIA by Wilfredo
-  Pega este bloque antes del </body> en
-  cualquier página que construyas.
-  ══════════════════════════════════════════
--->
-
-<style>
-  .firma-footer {
-    background: #080808;
-    border-top: 1px solid #1a1a1a;
-    padding: 2rem 2.5rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
-    font-family: 'Space Mono', monospace;
-  }
-
-  .firma-logo {
-    font-size: 0.9rem;
-    color: #f5f3ee;
-    letter-spacing: 0.04em;
-  }
-
-  .firma-logo span {
-    color: #e8401c;
-  }
-
-  .firma-copy {
-    font-size: 0.72rem;
-    color: #3a3a3a;
-    text-align: right;
-    line-height: 1.8;
-  }
-
-  .firma-link {
-    display: inline-block;
-    margin-top: 6px;
-    font-size: 0.72rem;
-    color: #6b6560;
-    text-decoration: none;
-    border-bottom: 1px solid #2a2a2a;
-    padding-bottom: 1px;
-    transition: color 0.2s, border-color 0.2s;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-  }
-
-  .firma-link:hover {
-    color: #e8401c;
-    border-color: #e8401c;
-  }
-
-  @media (max-width: 600px) {
-    .firma-footer {
-      flex-direction: column;
-      align-items: flex-start;
-      padding: 1.5rem 1.25rem;
-    }
-    .firma-copy {
-      text-align: left;
-    }
-  }
-</style>
-
-<footer class="firma-footer">
-  <div class="firma-logo">Secretar<span>IA</span></div>
-  <div class="firma-copy">
-    © 2025 SecretarIA — Desarrollado por Wilfredo
-    <br>
-    <a
-      class="firma-link"
-      href="https://forms.gle/wFzEv2nw5Dj1Gtzk7"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      ¿Quieres una página así para tu negocio? →
-    </a>
-  </div>
+<footer>
+  <div class="footer-logo">Secretar<span>IA</span></div>
+  <div class="footer-copy">© 2025 SecretarIA — Automatización de Ventas con IA para Negocios</div>
 </footer>
 
 <!-- CHATBOT FLOTANTE -->
@@ -745,7 +666,7 @@
 
 <script>
 // ── ESTADO ──
-const state = { step: 0, lead: { name:'', business:'', hasLeads:'', interested:'', phone:'', demo:'' } };
+const state = { step: 0, lead: { name:'', business:'', hasLeads:'', interested:'', phone:'', email:'', demo:'' } };
 let chatStarted = false;
 
 // ── FLUJO ──
@@ -770,8 +691,12 @@ const flow = [
     opts: ['Sí, quiero ver', 'Necesito más info', 'No por ahora']
   },
   {
-    bot: '¿Cuál es tu número de WhatsApp para confirmar la demo?',
+    bot: '¿Cuál es tu número de WhatsApp?',
     type: 'text', field: 'phone', ph: 'Ej: 787-555-1234'
+  },
+  {
+    bot: 'Y tu email — te enviamos la confirmación e invitación del calendario ahí.',
+    type: 'text', field: 'email', ph: 'tu@email.com'
   },
   {
     bot: '¿Cuándo prefieres tu demo de 15 minutos?',
@@ -779,7 +704,7 @@ const flow = [
     opts: ['Hoy', 'Mañana', 'Esta semana', 'La próxima semana']
   },
   {
-    bot: (s) => `✅ Recibido.\n\nNombre: ${s.lead.name}\nNegocio: ${s.lead.business}\nDemo: ${s.lead.demo}\n\nTe contactaremos al ${s.lead.phone} para confirmar. Revisa tu WhatsApp.`,
+    bot: (s) => `✅ Recibido.\n\nNombre: ${s.lead.name}\nNegocio: ${s.lead.business}\nDemo: ${s.lead.demo}\n\nRevisa ${s.lead.email} — te llega la invitación del calendario ahora mismo.`,
     type: 'done', field: null
   }
 ];
@@ -792,15 +717,17 @@ async function submitLead(lead) {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain' },
       body: JSON.stringify({
-        name: lead.name,
-        phone: lead.phone,
-        business: lead.business,
+        name:       lead.name,
+        phone:      lead.phone,
+        email:      lead.email,
+        business:   lead.business,
+        hasLeads:   lead.hasLeads,
         interested: lead.interested,
-        demo: lead.demo,
-        status: 'demo_agendada',
-        source: 'landing_bot',
-        timestamp: new Date().toISOString(),
-        intent: 'demo'
+        demo:       lead.demo,
+        status:     'demo_agendada',
+        source:     'landing_bot',
+        timestamp:  new Date().toISOString(),
+        intent:     'demo'
       })
     });
   } catch(e) {
